@@ -1,11 +1,7 @@
 import os
 
 
-def get_files_info(working_directory: str, directory: str = None) -> str:
-    # Check is directory parameter is passed or not
-    if directory is None:
-        return f'Error: "{directory}" is not a directory'
-
+def get_files_info(working_directory: str, directory: str) -> str:
     # get absolute path for working directory
     abs_path_working_directory = os.path.abspath(working_directory)
 
