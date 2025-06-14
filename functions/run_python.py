@@ -3,7 +3,7 @@ import subprocess
 from typing import Type
 
 
-def run_python_file(working_directory, file_path: str):
+def run_python_file(working_directory, file_path: str) -> str:
     # Check is file_path parameter is passed or not
     if file_path is None:
         return f'Error: file_path cannot be "{file_path}"'

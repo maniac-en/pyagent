@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
+from functions.call_function import call_function
+
 
 system_prompt: str = """
 You are a helpful AI coding agent.
@@ -20,7 +22,7 @@ When a user asks a question or makes a request, make a function call plan. You c
 All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
 """
 
-schema_get_files_info: Type[types.FunctionDeclaration] = types.FunctionDeclaration(
+schema_get_file_content: Type[types.FunctionDeclaration] = types.FunctionDeclaration(
     name="get_file_content",
     description="Read the contents of the given file path with a maximum limit of 10000, constrained to the working directory.",
     parameters=types.Schema(
@@ -33,7 +35,7 @@ schema_get_files_info: Type[types.FunctionDeclaration] = types.FunctionDeclarati
         },
     ),
 )
-schema_get_files_content: Type[types.FunctionDeclaration] = types.FunctionDeclaration(
+schema_get_files_info: Type[types.FunctionDeclaration] = types.FunctionDeclaration(
     name="get_files_info",
     description="Lists files in the specified directory along with their sizes, constrained to the working directory.",
     parameters=types.Schema(
@@ -79,7 +81,7 @@ schema_write_file: Type[types.FunctionDeclaration] = types.FunctionDeclaration(
 
 available_functions: Type[types.Tool] = types.Tool(
     function_declarations=[
-        schema_get_files_content,
+        schema_get_file_content,
         schema_get_files_info,
         schema_run_python_file,
         schema_write_file,
@@ -127,6 +129,14 @@ Response tokens: {response.usage_metadata.candidates_token_count}\
 
 if response.function_calls is not None:
     for function_call_part in response.function_calls:
-        print(f"Calling function: {function_call_part.name}({function_call_part.args})")
+        function_call_result: types.Content = call_function(
+            function_call_part, is_verbose
+        )
+        if function_call_result.parts[0].function_response.response is None:
+            raise Exception(
+                "something went really really really wrong"
+            )  # supposed to be fatal hence the message ^^^
+        if is_verbose:
+            print(f"-> {function_call_result.parts[0].function_response.response}")
 else:
     print(response.text)
