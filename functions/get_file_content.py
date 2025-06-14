@@ -3,7 +3,11 @@ import os
 MAX_CHARS: int = 10000
 
 
-def get_file_content(working_directory: str, file_path: str) -> str:
+def get_file_content(working_directory, file_path: str) -> str:
+    # Check is file_path parameter is passed or not
+    if file_path is None:
+        return f'Error: file_path cannot be "{file_path}"'
+
     # get absolute path for working directory
     abs_path_working_directory = os.path.abspath(working_directory)
 
@@ -22,4 +26,6 @@ def get_file_content(working_directory: str, file_path: str) -> str:
         file_contents: str = f.read(MAX_CHARS)
         f.close()
 
+    if len(file_contents) == 10000:
+        file_contents += f'\n[...File "{file_path}" truncated at 10000 characters]'
     return file_contents

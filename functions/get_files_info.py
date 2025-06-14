@@ -1,7 +1,7 @@
 import os
 
 
-def get_files_info(working_directory: str, directory: str) -> str:
+def get_files_info(working_directory, directory: str) -> str:
     # get absolute path for working directory
     abs_path_working_directory = os.path.abspath(working_directory)
 

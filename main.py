@@ -13,11 +13,27 @@ You are a helpful AI coding agent.
 When a user asks a question or makes a request, make a function call plan. You can perform the following operations:
 
 - List files and directories
+- Read file contents
+- Execute Python files with optional arguments
+- Write or overwrite files
 
 All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
 """
 
 schema_get_files_info: Type[types.FunctionDeclaration] = types.FunctionDeclaration(
+    name="get_file_content",
+    description="Read the contents of the given file path with a maximum limit of 10000, constrained to the working directory.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The file path to retreive the contents from, relative to the working directory. Providing this is mandatory else it'll return an error",
+            ),
+        },
+    ),
+)
+schema_get_files_content: Type[types.FunctionDeclaration] = types.FunctionDeclaration(
     name="get_files_info",
     description="Lists files in the specified directory along with their sizes, constrained to the working directory.",
     parameters=types.Schema(
@@ -30,10 +46,43 @@ schema_get_files_info: Type[types.FunctionDeclaration] = types.FunctionDeclarati
         },
     ),
 )
+schema_run_python_file: Type[types.FunctionDeclaration] = types.FunctionDeclaration(
+    name="run_python_file",
+    description="Run the file with the python3 interpretor with a hardcoded timeout of 30 seconds, constrained to the working directory, given it's a file ending with '.py' extension.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The file path to the python file which is supposed to be run, relative to the working directory. Providing this is mandatory else it'll return an error",
+            ),
+        },
+    ),
+)
+schema_write_file: Type[types.FunctionDeclaration] = types.FunctionDeclaration(
+    name="write_file",
+    description="Write the 'content' to the file passed, constrained to the working directory, given it's a regular file. It overwrites the existing contents of that file instead of appending to it!",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The file path to write the 'content' to, relative to the working directory. Providing this is mandatory else it'll return an error",
+            ),
+            "content": types.Schema(
+                type=types.Type.STRING,
+                description="The content to write to the file passed to the function. Providing this is mandatory else it'll return an error",
+            ),
+        },
+    ),
+)
 
 available_functions: Type[types.Tool] = types.Tool(
     function_declarations=[
+        schema_get_files_content,
         schema_get_files_info,
+        schema_run_python_file,
+        schema_write_file,
     ]
 )
 

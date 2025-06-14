@@ -1,9 +1,12 @@
 import os
 
+
 def write_file(working_directory, file_path, content: str) -> str:
-    # Check is file_path parameter is passed or not
+    # Check is file_path or content parameter are passed or not
     if file_path is None:
         return f'Error: file_path cannot be "{file_path}"'
+    elif content is None:
+        return f'Error: content cannot be "{content}"'
 
     # get absolute path for working directory
     abs_path_working_directory = os.path.abspath(working_directory)
@@ -21,9 +24,9 @@ def write_file(working_directory, file_path, content: str) -> str:
         return f'Error: File not found or is not a regular file: "{file_path}"'
 
     try:
-        with open(abs_path_target_file, 'w') as f:
+        with open(abs_path_target_file, "w") as f:
             f.write(content)
             f.close()
     except Exception as e:
-        return f'Error: {e.message}'
+        return f"Error: {e.message}"
     return f'Successfully wrote to "{file_path}" ({len(content)} characters written)'
